@@ -1,0 +1,62 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader("UTF-8") { reader ->
+        localProperties.load(reader)
+    }
+}
+
+apply plugin: "com.android.dynamic-feature"
+
+android {
+    namespace = "com.undostres_playground.undostres_playground.box"
+    compileSdk = 34
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    sourceSets {
+        applicationVariants.all { variant ->
+            main.assets.srcDirs += "${project.buildDir}/intermediates/flutter/${variant.name}/deferred_assets"
+            main.jniLibs.srcDirs += "${project.buildDir}/intermediates/flutter/${variant.name}/deferred_libs"
+        }
+    }
+
+    defaultConfig {
+        minSdk = 23
+        targetSdk = 34
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('/Users/oscar/Documents/Work/UnDosTres/APPs/testig_deferred/keys')
+            storePassword 'qwerty123456'
+            keyAlias 'key0'
+            keyPassword 'qwerty123456'
+        }
+        release {
+            storeFile file('/Users/oscar/Documents/Work/UnDosTres/APPs/testig_deferred/keys')
+            storePassword 'qwerty123456'
+            keyAlias 'key0'
+            keyPassword 'qwerty123456'
+        }
+    }
+
+    buildTypes {
+        release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig = signingConfigs.release
+        }
+    }
+}
+
+tasks.matching { it.name.contains("mergeRelease") }.all {
+    dependsOn(":app:compileFlutterBuildRelease")
+}
+
+dependencies {
+    implementation project(':app')
+}
